@@ -1,0 +1,21 @@
+{
+  "bot_id": "bank_of_oman",
+  "title": "My simple bot",
+  "description": "This is a simple bot",
+  "language": "python",
+  "data_type": "primary data",
+  "identifying_fields": [
+    "name",
+    "source_url"
+  ],
+  "files": [
+    "scraper.py"
+  ],
+  "frequency": "monthly",
+  "publisher": {
+    "name": "Publisher of the data",
+    "url": "Publisher's website",
+    "terms": "Copyright terms (e.g. Open Government License, n/a, etc)",
+    "terms_url": "A place where these terms can be checked or verified"
+  }
+}
