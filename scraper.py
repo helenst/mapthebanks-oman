@@ -26,11 +26,38 @@ class Entry(object):
     def __init__(self):
         self.name = ''
         self.tel = ''
+        self.fax = ''
+        self.telex = ''
+        self.swift = ''
+        self.box = ''
+        self.reuters = ''
+        self.url = ''
+        self.ceo_tel = ''
+        self.ceo_fax = ''
         self.lines = []
 
 
 entries = []
 current_entry = None
+
+patterns = (
+    ('tel', '.*Tel(?:\.|:|\s+)? (.*)'),
+    ('fax', '.*Fax(?:\.|:|\s+)? (.*)'),
+    ('telex', '.*Telex(?:\.|:|\s+)? (.*)'),
+    ('swift', '.*Swift(?:\.|:|\s+)? (.*)'),
+    ('box', '.*Box(?:\.|:|\s+)? (.*)'),
+    ('reuters', '.*Reuters(?:\.|:|\s+)? (.*)'),
+    ('url', '(http://.*)'),
+    ('ceo_tel', '.*CEO\'s Tel(?:\.|:|\s+)? (.*)'),
+    ('ceo_fax', '.*CEO\'s Fax(?:\.|:|\s+)? (.*)'),
+)
+
+
+def parse_text(text, entry):
+    for name, rx in patterns:
+        m = re.match(rx, text, re.UNICODE)
+        if m:
+            setattr(current_entry, name, m.group(1).strip())
 
 for node in data_cell.children:
     if node.name == 'h1':
@@ -40,16 +67,22 @@ for node in data_cell.children:
         current_entry.name = re.sub(r'\s+', ' ', node.text)
 
     elif node.name == 'p':
-        text = node.text.strip()
-        m = re.match('.*Tel(\.|:|\s+)? (.*)', text, re.UNICODE)
-        if m:
-            #import ipdb; ipdb.set_trace()  # XXX BREAKPOINT
-            g = current_entry.tel = m.group(2)
+        if len(node.find_all('br')) > 3:
+            lines = node.text.split('\n')
+            for line in lines:
+                parse_text(line.strip(), current_entry)
+        else:
+            text = node.text.strip()
+            parse_text(text, current_entry)
 
         current_entry.lines.append(node.text)
 
 entries.append(current_entry)
 
-print [(e.name, e.tel) for e in entries]
+import pprint
+
+for e in entries:
+    pprint.pprint(e.__dict__)
+
 #print entries[0].lines
 tel = 'Tel&nbsp;&nbsp; 24768888'
