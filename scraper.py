@@ -14,6 +14,8 @@ turbotlib.log("Starting run...")
 
 class Entry(object):
     def __init__(self):
+        self.sample_date = str(datetime.date.today())
+        self.source_url = ''
         self.name = ''
         self.tel = ''
         self.fax = ''
@@ -61,6 +63,7 @@ def fetch_data(url):
             if current_entry:
                 entries.append(current_entry)
             current_entry = Entry()
+            current_entry.source_url = url
             current_entry.name = re.sub(r'\s+', ' ', node.text)
 
         elif node.name == 'p':
