@@ -11,16 +11,6 @@ import requests
 
 turbotlib.log("Starting run...")
 
-local_banks_url = 'http://www.cbo-oman.org/related_Allbanks.htm'
-
-#response = requests.get(local_banks_url)
-#html = response.content
-
-html = open('oman.html')
-doc = BeautifulSoup(html)
-table = doc.find(id="AutoNumber3")
-data_cell = table.find_all('td')[1]
-
 
 class Entry(object):
     def __init__(self):
@@ -34,11 +24,6 @@ class Entry(object):
         self.url = ''
         self.ceo_tel = ''
         self.ceo_fax = ''
-        self.lines = []
-
-
-entries = []
-current_entry = None
 
 patterns = (
     ('tel', '.*Tel(?:\.|:|\s+)? (.*)'),
@@ -57,32 +42,50 @@ def parse_text(text, entry):
     for name, rx in patterns:
         m = re.match(rx, text, re.UNICODE)
         if m:
-            setattr(current_entry, name, m.group(1).strip())
+            setattr(entry, name, m.group(1).strip())
 
-for node in data_cell.children:
-    if node.name == 'h1':
-        if current_entry:
-            entries.append(current_entry)
-        current_entry = Entry()
-        current_entry.name = re.sub(r'\s+', ' ', node.text)
 
-    elif node.name == 'p':
-        if len(node.find_all('br')) > 3:
-            lines = node.text.split('\n')
-            for line in lines:
-                parse_text(line.strip(), current_entry)
-        else:
-            text = node.text.strip()
-            parse_text(text, current_entry)
+def fetch_data(url):
+    response = requests.get(url)
+    html = response.content
 
-        current_entry.lines.append(node.text)
+    doc = BeautifulSoup(html)
+    table = doc.find(id="AutoNumber3")
+    data_cell = table.find_all('td')[-1]
 
-entries.append(current_entry)
+    entries = []
+    current_entry = None
 
-import pprint
+    for node in data_cell.children:
+        if node.name == 'h1':
+            if current_entry:
+                entries.append(current_entry)
+            current_entry = Entry()
+            current_entry.name = re.sub(r'\s+', ' ', node.text)
 
-for e in entries:
-    pprint.pprint(e.__dict__)
+        elif node.name == 'p':
+            if len(node.find_all('br')) > 3:
+                lines = node.text.split('\n')
+                for line in lines:
+                    parse_text(line.strip(), current_entry)
+            else:
+                text = node.text.strip()
+                parse_text(text, current_entry)
 
-#print entries[0].lines
-tel = 'Tel&nbsp;&nbsp; 24768888'
+    entries.append(current_entry)
+    return entries
+
+urls = [
+    'http://www.cbo-oman.org/related_Allbanks.htm',
+    'http://www.cbo-oman.org/related_specialBanks.htm',
+    'http://www.cbo-oman.org/related_forign.htm',
+    'http://www.cbo-oman.org/related_finance.htm',
+    'http://www.cbo-oman.org/related_exchange.htm',
+]
+
+for url in urls:
+    turbotlib.log("Scraping {}...".format(url))
+    entries = fetch_data(url)
+
+    for e in entries:
+        print json.dumps(e.__dict__)
