@@ -10,7 +10,9 @@
   ],
   "company_fields": {"name": "name"},
   "files": [
-    "scraper.py"
+    "scraper.py",
+    "licence_transformer.py",
+    "country.json"
   ],
   "transformers": [{
     "file":  "licence_transformer.py",
