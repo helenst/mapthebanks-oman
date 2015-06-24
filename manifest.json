@@ -8,6 +8,7 @@
     "name",
     "source_url"
   ],
+  "company_fields": {"name": "name"},
   "files": [
     "scraper.py"
   ],
