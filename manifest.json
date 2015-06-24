@@ -12,6 +12,11 @@
   "files": [
     "scraper.py"
   ],
+  "transformers": [{
+    "file":  "licence_transformer.py",
+    "data_type": "simple-licence",
+    "identifying_fields": ["company_name"]
+  }],
   "frequency": "monthly",
   "publisher": {
     "name": "Publisher of the data",
