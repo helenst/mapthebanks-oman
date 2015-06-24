@@ -1,7 +1,7 @@
 {
   "bot_id": "bank_of_oman",
-  "title": "My simple bot",
-  "description": "This is a simple bot",
+  "title": "Bank of Oman",
+  "description": "Bot for scraping Bank of Oman data (http://www.cbo-oman.org/related.htm)",
   "language": "python",
   "data_type": "primary data",
   "identifying_fields": [
