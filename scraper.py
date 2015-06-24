@@ -26,6 +26,7 @@ class Entry(object):
         self.url = ''
         self.ceo_tel = ''
         self.ceo_fax = ''
+        self.country = ''
 
 patterns = (
     ('tel', '.*Tel(?:\.|:|\s+)? (.*)'),
@@ -47,7 +48,7 @@ def parse_text(text, entry):
             setattr(entry, name, m.group(1).strip())
 
 
-def fetch_data(url):
+def fetch_data(url, is_oman):
     response = requests.get(url)
     html = response.content
 
@@ -55,16 +56,22 @@ def fetch_data(url):
     table = doc.find(id="AutoNumber3")
     data_cell = table.find_all('td')[-1]
 
-    entries = []
     current_entry = None
 
     for node in data_cell.children:
         if node.name == 'h1':
             if current_entry:
-                entries.append(current_entry)
+                yield current_entry
             current_entry = Entry()
             current_entry.source_url = url
-            current_entry.name = re.sub(r'\s+', ' ', node.text)
+            current_entry.name = re.sub(r'\s+', ' ', node.text).strip()
+            if is_oman:
+                current_entry.country = 'Oman'
+            else:
+                words = set(current_entry.name.split())
+                common = words.intersection(country_names)
+                if common:
+                    current_entry.country = common.pop()
 
         elif node.name == 'p':
             if len(node.find_all('br')) > 3:
@@ -75,20 +82,22 @@ def fetch_data(url):
                 text = node.text.strip()
                 parse_text(text, current_entry)
 
-    entries.append(current_entry)
-    return entries
+    yield current_entry
 
+
+# List of URLs and whether or not they are listing local institutions
 urls = [
-    'http://www.cbo-oman.org/related_Allbanks.htm',
-    'http://www.cbo-oman.org/related_specialBanks.htm',
-    'http://www.cbo-oman.org/related_forign.htm',
-    'http://www.cbo-oman.org/related_finance.htm',
-    'http://www.cbo-oman.org/related_exchange.htm',
+    ('http://www.cbo-oman.org/related_Allbanks.htm', True),
+    ('http://www.cbo-oman.org/related_specialBanks.htm', True),
+    ('http://www.cbo-oman.org/related_forign.htm', False),
+    ('http://www.cbo-oman.org/related_finance.htm', True),
+    ('http://www.cbo-oman.org/related_exchange.htm', True),
 ]
 
-for url in urls:
-    turbotlib.log("Scraping {}...".format(url))
-    entries = fetch_data(url)
+country_list = json.load(open('country.json'))
+country_names = country_list.values()
 
-    for e in entries:
+for url, is_oman in urls:
+    turbotlib.log("Scraping {}...".format(url))
+    for e in fetch_data(url, is_oman):
         print json.dumps(e.__dict__)
