@@ -43,9 +43,11 @@ patterns = (
 
 def parse_text(text, entry):
     for name, rx in patterns:
-        m = re.match(rx, text, re.UNICODE)
+        m = re.match(rx, text, re.UNICODE | re.DOTALL)
         if m:
-            setattr(entry, name, m.group(1).strip())
+            text = m.group(1).strip()
+            text = re.sub('\s+', ' ', text)
+            setattr(entry, name, text)
 
 
 def fetch_data(url, is_oman):
