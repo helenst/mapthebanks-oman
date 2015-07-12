@@ -29,11 +29,11 @@ class Entry(object):
         self.country = ''
 
 patterns = (
+    ('box', '.*Box(?:\.|:|\s+)? (.*)'),
     ('tel', '.*Tel(?:\.|:|\s+)? (.*)'),
     ('fax', '.*Fax(?:\.|:|\s+)? (.*)'),
     ('telex', '.*Telex(?:\.|:|\s+)? (.*)'),
     ('swift', '.*Swift(?:\.|:|\s+)? (.*)'),
-    ('box', '.*Box(?:\.|:|\s+)? (.*)'),
     ('reuters', '.*Reuters(?:\.|:|\s+)? (.*)'),
     ('url', '(http://.*)'),
     ('ceo_tel', '.*CEO\'s Tel(?:\.|:|\s+)? (.*)'),

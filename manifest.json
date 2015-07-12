@@ -21,9 +21,9 @@
   }],
   "frequency": "monthly",
   "publisher": {
-    "name": "Publisher of the data",
-    "url": "Publisher's website",
-    "terms": "Copyright terms (e.g. Open Government License, n/a, etc)",
-    "terms_url": "A place where these terms can be checked or verified"
+    "name": "Central Bank of Oman",
+    "url": "http://www.cbo-oman.org/",
+    "terms": "n/a",
+    "terms_url": "n/a"
   }
 }
