@@ -50,7 +50,7 @@ def parse_text(text, entry):
             setattr(entry, name, text)
 
 
-def fetch_data(url, is_oman):
+def fetch_data(url, org_type, is_local):
     response = requests.get(url)
     html = response.content
 
@@ -66,8 +66,9 @@ def fetch_data(url, is_oman):
                 yield current_entry
             current_entry = Entry()
             current_entry.source_url = url
+            current_entry.org_type = org_type
             current_entry.name = re.sub(r'\s+', ' ', node.text).strip()
-            if is_oman:
+            if is_local:
                 current_entry.country = 'Oman'
             else:
                 words = set(current_entry.name.split())
@@ -87,19 +88,39 @@ def fetch_data(url, is_oman):
     yield current_entry
 
 
-# List of URLs and whether or not they are listing local institutions
-urls = [
-    ('http://www.cbo-oman.org/related_Allbanks.htm', True),
-    ('http://www.cbo-oman.org/related_specialBanks.htm', True),
-    ('http://www.cbo-oman.org/related_forign.htm', False),
-    ('http://www.cbo-oman.org/related_finance.htm', True),
-    ('http://www.cbo-oman.org/related_exchange.htm', True),
+# List of pages to scrape - plus some extra metadata about them
+pages = [
+    {
+        'url': 'http://www.cbo-oman.org/related_Allbanks.htm',
+        'org_type': 'Local Banks',
+        'is_local': True,
+    },
+    {
+        'url': 'http://www.cbo-oman.org/related_specialBanks.htm',
+        'org_type': 'Specialized Banks',
+        'is_local': True,
+    },
+    {
+        'url': 'http://www.cbo-oman.org/related_forign.htm',
+        'org_type': 'Foreign Banks - Commercial Banks',
+        'is_local': False,
+    },
+    {
+        'url': 'http://www.cbo-oman.org/related_finance.htm',
+        'org_type': 'Financial and Leasing Companies',
+        'is_local': True,
+    },
+    {
+        'url': 'http://www.cbo-oman.org/related_exchange.htm',
+        'org_type': 'Money Exchange Companies',
+        'is_local': True
+    },
 ]
 
 country_list = json.load(open('country.json'))
 country_names = country_list.values()
 
-for url, is_oman in urls:
-    turbotlib.log("Scraping {}...".format(url))
-    for e in fetch_data(url, is_oman):
+for page in pages:
+    turbotlib.log("Scraping {}...".format(page['url']))
+    for e in fetch_data(**page):
         print json.dumps(e.__dict__)
