@@ -32,7 +32,7 @@ while True:
             "permission_type": "operating",
         }],
         "licence_issuer": {
-            "name": "Bank of Oman",
+            "name": "Central Bank of Oman",
             "jurisdiction": "Oman",
         },
         "jurisdiction_of_licence": "Oman",
