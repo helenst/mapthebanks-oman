@@ -27,7 +27,10 @@ while True:
                 "jurisdiction": raw_record['country'],
             }
         },
-        "permissions": [],
+        "permissions": [{
+            "activity_name": raw_record['org_type'],
+            "permission_type": "operating",
+        }],
         "licence_issuer": {
             "name": "Bank of Oman",
             "jurisdiction": "Oman",
